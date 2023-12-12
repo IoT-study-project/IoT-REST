@@ -43,7 +43,7 @@ To be called from embedded system. Pairs calling device with user awaiting for p
 (may be better to sent token in Authorization header, but I do not see any vulnerabilities this way, sending token from mobile app to device requires encrypting message)
 
 `{
-  'username': username,
+  'username': username
 }`
 ## /get-last-data [GET]
 Returns most recent data from every paired up device
