@@ -1,6 +1,6 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
-//import { bcrypt } from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 const dynamo = DynamoDBDocument.from(new DynamoDB());
 
@@ -12,7 +12,7 @@ export const handler = async (event) => {
     const headers = {
         'Content-Type': 'application/json',
     };
-    
+
     const data = event.body;
 
     try {
@@ -21,8 +21,8 @@ export const handler = async (event) => {
                 body = await dynamo.put({
                     TableName: 'users',
                     Item: {
-                        username : data.username,
-                        passwordHash : data.password // to hash
+                        username: data.username,
+                        passwordHash: await bcrypt.hash(data.password, 10)
                     }
                 });
                 break;

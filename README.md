@@ -1,7 +1,7 @@
 # URL
 https://ugbnc4iymb.execute-api.us-east-1.amazonaws.com/default
 # Endpoints
-## /register [POST]
+## /register [POST] - deployed
 Creates new user, saves them to database with given username and encrypted password
 ### Request body
 `{
@@ -39,11 +39,9 @@ To be called from mobile app. Enables pairing. Awaits for /pair-me request from 
 }`
 ## /pair-me [POST]
 To be called from embedded system. Pairs calling device with user awaiting for pairing
-### Request body
-(may be better to sent token in Authorization header, but I do not see any vulnerabilities this way, sending token from mobile app to device requires encrypting message)
-
+### Required headers
 `{
-  'username': username
+  'Authorization': 'Bearer ' + validJwtToken
 }`
 ## /get-last-data [GET]
 Returns most recent data from every paired up device
