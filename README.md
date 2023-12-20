@@ -8,7 +8,7 @@ Creates new user, saves them to database with given username and encrypted passw
   'username': username,
   'password': password
 }`
-## /login [POST]
+## /login [POST] - deployed
 Signs in registered user, returns authorization token (JWT)
 ### Request body
 `{

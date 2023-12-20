@@ -5,14 +5,11 @@ import bcrypt from 'bcrypt';
 const dynamo = DynamoDBDocument.from(new DynamoDB());
 
 export const handler = async (event) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
-
     let body;
     let statusCode = '200';
     const headers = {
         'Content-Type': 'application/json',
     };
-
     const data = event.body;
 
     try {
