@@ -1,5 +1,8 @@
+// Since session expires after 1h, I decided to remove /logout endpoint
+
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import jwt from 'jsonwebtoken';
 
 const client = new DynamoDBClient({});
@@ -29,14 +32,18 @@ async function verifyToken(token) {
 }
 
 async function logoutUser(username) {
-    const command = new PutCommand({
+    const command = new UpdateCommand({
         TableName: "users",
-        Item: {
-            "username": username,
-            "token": null
+        Key: {
+            username: username,
         },
+        UpdateExpression: "set jwtToken = :jwtToken",
+        ExpressionAttributeValues: {
+            ":jwtToken": null,
+        },
+        ReturnValues: "ALL_NEW",
     });
-    return response = await docClient.send(command);
+    return await docClient.send(command);
 }
 
 export const handler = async (event) => {
@@ -51,15 +58,15 @@ export const handler = async (event) => {
             statusCode = '400';
             throw new Error(`Unsupported method "${event.httpMethod}"`);
         }
-        const token = event.body.token;
-        verifyToken(token).then((username) => {
-            logoutUser(username).catch((err) => {
-                throw new Error("Logout failed: " + err.message);
-            });
-        }).catch((err) => {
+        const token = event.headers["Authorization"].split(" ")[1];
+        console.log(token);
+        const username = await verifyToken(token).catch((err) => {
             statusCode = '401';
             throw new Error(err.message);
         });
+        await logoutUser(username).catch((err) => {
+            throw new Error("Logout failed: " + err.message);
+        })
     } catch (err) {
         if (statusCode === '200') {
             statusCode = '500';

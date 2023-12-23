@@ -23,10 +23,10 @@ async function putUser(username, password) {
         TableName: "users",
         Item: {
             "username": username,
-            "token": await bcrypt.hash(password, 10)
+            "passwordHash": await bcrypt.hash(password, 10)
         },
     });
-    return response = await docClient.send(command);
+    return await docClient.send(command);
 }
 
 export const handler = async (event) => {

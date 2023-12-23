@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -53,8 +53,8 @@ export const handler = async (event) => {
             throw new Error(`User ${event.body.username} not found`);
         }
         const passwordHash = user.passwordHash;
-        const secret = await getSecret().catch(() => {
-            throw new Error("Error retrieving secret key");
+        const secret = await getSecret().catch((err) => {
+            throw new Error("Error retrieving secret key: " + err.message);
         })
         if (!secret) {
             throw new Error("Secret key does not exist");
@@ -63,15 +63,13 @@ export const handler = async (event) => {
             statusCode = '401';
             throw new Error("Access denied")
         }
+        const token = jwt.sign({
+            username: event.body.username,
+            expiresIn: "1h"
+        }, secret);
         body = {
             username: event.body.username,
-            token: jwt.sign(
-                {
-                    username: event.body.username,
-                    expiresIn: "1h"
-                },
-                secret
-            )
+            token: token
         };
     } catch (err) {
         if (statusCode === '200') {

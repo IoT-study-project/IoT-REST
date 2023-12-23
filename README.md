@@ -9,7 +9,7 @@ Creates new user, saves them to database with given username and encrypted passw
   'password': password
 }`
 ## /login [POST] - deployed
-Signs in registered user, returns authorization token (JWT)
+Signs in registered user, returns authorization token (JWT) - expires in 1h
 ### Request body
 `{
   'username': username,
@@ -19,12 +19,6 @@ Signs in registered user, returns authorization token (JWT)
 `{
   'username': username,
   'token': validJwtToken
-}`
-## /logout [POST] - deployed
-Signs out logged in user
-### Required headers
-`{
-  'Authorization': 'Bearer ' + validJwtToken
 }`
 ## /pair-device [POST]
 To be called from mobile app. Enables pairing. Awaits for /pair-me request from embedded system [below]
