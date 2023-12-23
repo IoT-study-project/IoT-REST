@@ -8,6 +8,10 @@ Creates new user, saves them to database with given username and encrypted passw
   'username': username,
   'password': password
 }`
+
+username - letters (upper and lowercase) and numbers, length from 6 to 16
+
+password - at least one number, one uppercase letter, one lowercase letter and one special character length from 8 to 32
 ## /login [POST] - deployed
 Signs in registered user, returns authorization token (JWT) - expires in 1h
 ### Request body
@@ -15,6 +19,10 @@ Signs in registered user, returns authorization token (JWT) - expires in 1h
   'username': username,
   'password': password
 }`
+
+username - letters (upper and lowercase) and numbers, length from 6 to 16
+
+password - at least one number, one uppercase letter, one lowercase letter and one special character length from 8 to 32
 ## Response body
 `{
   'username': username,

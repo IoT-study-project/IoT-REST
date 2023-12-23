@@ -7,6 +7,15 @@ import bcrypt from 'bcrypt';
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
+function isUsernameValid(username) {
+    return /^[0-9A-Za-z]{6,16}$/.test(username);
+}
+
+function isPasswordValid(password) {
+    return /^(?=.*?[0-9])(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[^0-9A-Za-z]).{8,32}$/
+        .test(password);
+}
+
 async function userExists(username) {
     const command = new GetCommand({
         TableName: 'users',
@@ -35,15 +44,25 @@ export const handler = async (event) => {
     const headers = {
         'Content-Type': 'application/json',
     };
+    const username = event.body.username;
+    const password = event.body.password;
 
     try {
+        if (!isUsernameValid(username)) {
+            statusCode = '400';
+            throw new Error(`Invalid username`);
+        }
+        if (!isPasswordValid(password)) {
+            statusCode = '400';
+            throw new Error(`Invalid password`);
+        }
         switch (event.httpMethod) {
             case 'POST':
-                if (await userExists(event.body.username)) {
+                if (await userExists(username)) {
                     statusCode = '409';
-                    throw new Error(`User ${event.body.username} already exists`)
+                    throw new Error(`User ${username} already exists`)
                 }
-                body = await putUser(event.body.username, event.body.password).catch((err) => {
+                body = await putUser(username, password).catch((err) => {
                     throw new Error("Registration failed: " + err.message)
                 });
                 break;

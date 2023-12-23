@@ -7,6 +7,15 @@ import jwt from 'jsonwebtoken';
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
+function isUsernameValid(username) {
+    return /^[0-9A-Za-z]{6,16}$/.test(username);
+}
+
+function isPasswordValid(password) {
+    return /^(?=.*?[0-9])(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[^0-9A-Za-z]).{8,32}$/
+        .test(password);
+}
+
 async function getSecret() {
     const secret_name = "jwt";
     const client = new SecretsManagerClient({
@@ -21,11 +30,11 @@ async function getSecret() {
     return response.SecretString;
 }
 
-async function getUser(event) {
+async function getUser(username) {
     const command = new GetCommand({
         TableName: 'users',
         Key: {
-            'username': event.body.username
+            'username': username
         }
     });
     const { Item } = await docClient.send(command);
@@ -38,19 +47,29 @@ export const handler = async (event) => {
     const headers = {
         'Content-Type': 'application/json',
     };
+    const username = event.body.username;
+    const password = event.body.password;
 
     try {
+        if (!isUsernameValid(username)) {
+            statusCode = '400';
+            throw new Error(`Invalid username`);
+        }
+        if (!isPasswordValid(password)) {
+            statusCode = '400';
+            throw new Error(`Invalid password`);
+        }
         if (event.httpMethod !== 'POST') {
             statusCode = '400';
             throw new Error(`Unsupported method "${event.httpMethod}"`);
         }
-        const user = await getUser(event).catch(() => {
+        const user = await getUser(username).catch(() => {
             statusCode = '404';
-            throw new Error(`User ${event.body.username} not found`);
+            throw new Error(`User ${username} not found`);
         });
         if (!user) {
             statusCode = '404';
-            throw new Error(`User ${event.body.username} not found`);
+            throw new Error(`User ${username} not found`);
         }
         const passwordHash = user.passwordHash;
         const secret = await getSecret().catch((err) => {
@@ -59,16 +78,16 @@ export const handler = async (event) => {
         if (!secret) {
             throw new Error("Secret key does not exist");
         }
-        if (!await bcrypt.compare(event.body.password, passwordHash)) {
+        if (!await bcrypt.compare(password, passwordHash)) {
             statusCode = '401';
             throw new Error("Access denied")
         }
         const token = jwt.sign({
-            username: event.body.username,
+            username: username,
             expiresIn: "1h"
         }, secret);
         body = {
-            username: event.body.username,
+            username: username,
             token: token
         };
     } catch (err) {
