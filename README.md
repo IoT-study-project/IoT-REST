@@ -20,11 +20,11 @@ Signs in registered user, returns authorization token (JWT)
   'username': username,
   'token': validJwtToken
 }`
-## /logout [POST]
+## /logout [POST] - deployed
 Signs out logged in user
-### Request body
+### Required headers
 `{
-  'username': username,
+  'Authorization': 'Bearer ' + validJwtToken
 }`
 ## /pair-device [POST]
 To be called from mobile app. Enables pairing. Awaits for /pair-me request from embedded system [below]
@@ -39,9 +39,9 @@ To be called from mobile app. Enables pairing. Awaits for /pair-me request from 
 }`
 ## /pair-me [POST]
 To be called from embedded system. Pairs calling device with user awaiting for pairing
-### Required headers
+### Request body
 `{
-  'Authorization': 'Bearer ' + validJwtToken
+  'username': username
 }`
 ## /get-last-data [GET]
 Returns most recent data from every paired up device
