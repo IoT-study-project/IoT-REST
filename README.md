@@ -29,7 +29,7 @@ password - at least one number, one uppercase letter, one lowercase letter and o
   'token': validJwtToken
 }`
 ## /pair-device [POST]
-To be called from mobile app. Enables pairing. Awaits for /pair-me request from embedded system [below]
+To be called from mobile app. Enables pairing. Awaits for /pair-me request from IoT device [below]
 ### Required headers
 `{
   'Authorization': 'Bearer ' + validJwtToken
@@ -40,7 +40,7 @@ To be called from mobile app. Enables pairing. Awaits for /pair-me request from 
   'deviceId': deviceId
 }`
 ## /pair-me [POST]
-To be called from embedded system. Pairs calling device with user awaiting for pairing
+To be called from IoT device. Pairs calling device with user awaiting for pairing
 ### Request body
 `{
   'username': username
