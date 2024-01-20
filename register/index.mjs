@@ -52,13 +52,16 @@ async function pairDefault(username) {
 }
 
 export const handler = async (event) => {
-    let body;
+    let body = JSON.parse(event.body);
     let statusCode = '200';
     const headers = {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Headers': 'Content-Type'
     };
-    const username = event.username;
-    const password = event.password;
+    const username = body.username;
+    const password = body.password;
 
     try {
         if (!isUsernameValid(username)) {

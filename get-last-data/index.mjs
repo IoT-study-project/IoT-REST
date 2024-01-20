@@ -62,6 +62,9 @@ export const handler = async (event) => {
     let statusCode = '200';
     const headers = {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
     };
 
     try {
