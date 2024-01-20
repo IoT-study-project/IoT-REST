@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -42,13 +42,13 @@ async function getUser(username) {
 }
 
 export const handler = async (event) => {
-    let body;
+    let body = JSON.parse(event.body);
     let statusCode = '200';
     const headers = {
         'Content-Type': 'application/json',
     };
-    const username = event.body.username;
-    const password = event.body.password;
+    const username = body.username;
+    const password = body.password;
 
     try {
         if (!isUsernameValid(username)) {

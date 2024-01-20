@@ -38,14 +38,27 @@ async function putUser(username, password) {
     return await docClient.send(command);
 }
 
+// Temporary function, as pairing is not implemented
+async function pairDefault(username) {
+    const command = new PutCommand({
+        TableName: "paired",
+        Item: {
+            "id": crypto.randomUUID().toString(),
+            "username": username,
+            "device_id": "0"
+        },
+    });
+    return await docClient.send(command);
+}
+
 export const handler = async (event) => {
-    let body;
+    let body = JSON.parse(event.body);
     let statusCode = '200';
     const headers = {
         'Content-Type': 'application/json',
     };
-    const username = event.body.username;
-    const password = event.body.password;
+    const username = body.username;
+    const password = body.password;
 
     try {
         if (!isUsernameValid(username)) {
@@ -56,20 +69,20 @@ export const handler = async (event) => {
             statusCode = '400';
             throw new Error(`Invalid password`);
         }
-        switch (event.httpMethod) {
-            case 'POST':
-                if (await userExists(username)) {
-                    statusCode = '409';
-                    throw new Error(`User ${username} already exists`)
-                }
-                body = await putUser(username, password).catch((err) => {
-                    throw new Error("Registration failed: " + err.message)
-                });
-                break;
-            default:
-                statusCode = '400';
-                throw new Error(`Unsupported method "${event.httpMethod}"`);
+        if (event.httpMethod !== "POST") {
+            statusCode = '400';
+            throw new Error(`Unsupported method "${event.httpMethod}"`);
         }
+        if (await userExists(username)) {
+            statusCode = '409';
+            throw new Error(`User ${username} already exists`)
+        }
+        await pairDefault(username).catch((err) => {
+            throw new Error("Default pairing failed: " + err.message)
+        });
+        body = await putUser(username, password).catch((err) => {
+            throw new Error("Registration failed: " + err.message)
+        });
     } catch (err) {
         if (statusCode === '200') {
             statusCode = '500';
