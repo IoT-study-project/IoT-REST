@@ -1,5 +1,5 @@
 # URL
-https://o420wgpkd4.execute-api.eu-north-1.amazonaws.com/default/
+https://qp82yz9yd7.execute-api.eu-north-1.amazonaws.com/api
 # Endpoints
 ## /register [POST] - deployed
 Creates new user, saves them to database with given username and encrypted password
