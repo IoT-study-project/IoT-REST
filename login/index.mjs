@@ -42,13 +42,13 @@ async function getUser(username) {
 }
 
 export const handler = async (event) => {
-    let body = JSON.parse(event.body);
+    let body;
     let statusCode = '200';
     const headers = {
         'Content-Type': 'application/json',
     };
-    const username = body.username;
-    const password = body.password;
+    const username = event.username;
+    const password = event.password;
 
     try {
         if (!isUsernameValid(username)) {
