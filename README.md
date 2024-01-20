@@ -28,23 +28,6 @@ password - at least one number, one uppercase letter, one lowercase letter and o
   'username': username,
   'token': validJwtToken
 }`
-## /pair-device [POST]
-To be called from mobile app. Enables pairing. Awaits for /pair-me request from IoT device [below]
-### Required headers
-`{
-  'Authorization': 'Bearer ' + validJwtToken
-}`
-## Response body
-`{
-  'username': username,
-  'deviceId': deviceId
-}`
-## /pair-me [POST]
-To be called from IoT device. Pairs calling device with user awaiting for pairing
-### Request body
-`{
-  'username': username
-}`
 ## /get-last-data [GET]
 Returns most recent data from every paired up device
 ### Required headers
@@ -59,5 +42,3 @@ Returns most recent data from every paired up device
     ...
   ]
 }`
-<hr>
-This documentation covers only the successful case
