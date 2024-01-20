@@ -54,8 +54,8 @@ Returns most recent data from every paired up device
 ## Response body
 `{
   data: [
-    dataFromDevice1,
-    datafromDevice2,
+    { device1Id: dataFromDevice1 },
+    { device2Id: datafromDevice2 },
     ...
   ]
 }`
