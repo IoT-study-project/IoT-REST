@@ -86,9 +86,8 @@ export const handler = async (event) => {
             throw new Error("Access denied")
         }
         const token = jwt.sign({
-            username: username,
-            expiresIn: "1h"
-        }, secret);
+            username: username
+        }, secret, { expiresIn: 1800 }); // 30 min
         body = {
             username: username,
             token: token
